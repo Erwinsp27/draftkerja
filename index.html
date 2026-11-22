@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DraftKerja — AI Proposal Drafter untuk Pekerja Lepas</title>
+<meta name="description" content="DraftKerja: ubah brief pekerjaan menjadi draf proposal yang rapi dalam satu menit. Analisis lokal gratis; poles dengan model AI gratis lewat kunci Anda sendiri (BYOK).">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">SLAY HACKS 2026 · AI untuk pekerja lepas Indonesia</p>
+    <h1>DraftKerja</h1>
+    <p class="tagline">Tempel brief pekerjaan, dapatkan draf proposal yang rapi dalam satu menit — Bahasa Indonesia atau English.</p>
+    <p class="honest">Gratis, tanpa daftar. Analisis brief berjalan lokal di perangkat Anda. Draf dibuat dari template — tidak ada pengalaman atau kredensial yang dikarang. Poles dengan AI hanya bila Anda memakai kunci API Anda sendiri.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card" aria-label="Form proposal">
+    <h2>1. Brief pekerjaan</h2>
+    <label for="brief">Tempel brief dari klien (Upwork, Fiverr, WhatsApp, dan lain-lain)</label>
+    <textarea id="brief" rows="6" placeholder="Contoh: Dibutuhkan desainer logo warung kopi, gaya minimalis, budget Rp500.000, selesai 5 hari..."></textarea>
+    <div class="samples">
+      <span>Coba contoh:</span>
+      <button type="button" class="chip" data-sample="logo">Logo warung kopi</button>
+      <button type="button" class="chip" data-sample="artikel">Artikel SEO</button>
+      <button type="button" class="chip" data-sample="web">Landing page</button>
+    </div>
+
+    <h2>2. Detail Anda</h2>
+    <div class="grid">
+      <div>
+        <label for="name">Nama Anda</label>
+        <input id="name" type="text" placeholder="Nama Anda" autocomplete="name">
+      </div>
+      <div>
+        <label for="rate">Tarif yang ditawarkan</label>
+        <input id="rate" type="text" placeholder="cth: Rp500.000 / proyek">
+      </div>
+      <div>
+        <label for="timeline">Perkiraan selesai</label>
+        <input id="timeline" type="text" placeholder="cth: 5 hari">
+      </div>
+      <div>
+        <label for="portfolio">Link portofolio / contoh kerja</label>
+        <input id="portfolio" type="text" placeholder="cth: https://... (opsional)">
+      </div>
+    </div>
+    <label for="experience">Pengalaman Anda (opsional — tulis sendiri, tidak dikarang aplikasi)</label>
+    <input id="experience" type="text" placeholder="cth: 3 tahun mendesain logo untuk UMKM">
+    <div class="grid">
+      <div>
+        <label for="tone">Nada proposal</label>
+        <select id="tone">
+          <option value="ramah">Ramah (friendly)</option>
+          <option value="formal">Formal</option>
+          <option value="percaya">Percaya diri (confident)</option>
+        </select>
+      </div>
+      <div>
+        <label for="language">Bahasa draf</label>
+        <select id="language">
+          <option value="id">Bahasa Indonesia</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+    <button id="generate" type="button" class="primary">Buat Draf Proposal</button>
+    <p id="status" class="status" role="status"></p>
+  </section>
+
+  <section class="card" aria-label="Hasil analisis">
+    <h2>Analisis brief (lokal, bukan AI)</h2>
+    <p id="analysis-empty" class="muted">Belum ada analisis. Tempel brief lalu tekan "Buat Draf Proposal".</p>
+    <dl id="analysis" class="analysis" hidden>
+      <div><dt>Jenis pekerjaan</dt><dd id="a-type">—</dd></div>
+      <div><dt>Anggaran terdeteksi</dt><dd id="a-budget">—</dd></div>
+      <div><dt>Tenggat terdeteksi</dt><dd id="a-deadline">—</dd></div>
+      <div><dt>Platform terdeteksi</dt><dd id="a-platform">—</dd></div>
+      <div><dt>Jumlah hasil terdeteksi</dt><dd id="a-count">—</dd></div>
+    </dl>
+    <h3>Kelengkapan proposal</h3>
+    <p class="score"><span id="score">0</span>/100</p>
+    <ul id="checklist" class="checklist"></ul>
+  </section>
+
+  <section class="card" aria-label="Draf proposal">
+    <h2>Draf proposal</h2>
+    <p class="muted">Draf bisa diedit langsung sebelum disalin atau disimpan.</p>
+    <textarea id="draft" rows="14" placeholder="Draf proposal Anda akan muncul di sini..."></textarea>
+    <div class="actions">
+      <button id="copy" type="button">Salin Draf</button>
+      <button id="save" type="button">Simpan ke Perpustakaan</button>
+      <button id="polish" type="button">Poles dengan AI (BYOK)</button>
+    </div>
+    <p class="muted small">Tombol "Poles dengan AI" memakai kunci API Anda sendiri (lihat Pengaturan di bawah) dan mengirim hanya teks draf ke endpoint yang Anda atur. Tanpa kunci, tombol ini tidak melakukan apa-apa.</p>
+  </section>
+
+  <section class="card" aria-label="Perpustakaan draf">
+    <h2>Perpustakaan draf tersimpan</h2>
+    <p class="muted">Tersimpan lokal di perangkat ini (localStorage). Tidak dikirim ke mana pun.</p>
+    <ul id="library" class="library"></ul>
+    <p id="library-empty" class="muted">Belum ada draf tersimpan.</p>
+  </section>
+
+  <section class="card" aria-label="Pengaturan AI">
+    <h2>Pengaturan AI (BYOK — Bring Your Own Key)</h2>
+    <p class="muted">Opsional. Bila diisi, tombol "Poles dengan AI" akan meminta model memperbaiki bahasa draf, tanpa mengubah isinya. Kunci hanya tersimpan di perangkat ini dan hanya dikirim ke endpoint di bawah.</p>
+    <label for="endpoint">Endpoint (OpenAI-compatible chat completions)</label>
+    <input id="endpoint" type="text" value="https://100milionseek.top/v1/chat/completions">
+    <label for="model">Model</label>
+    <input id="model" type="text" value="deepseek-v4.1-flash-free">
+    <label for="apikey">Kunci API Anda</label>
+    <input id="apikey" type="password" placeholder="Tempel kunci Anda di sini (tidak pernah disertakan di repo)">
+    <div class="actions">
+      <button id="save-settings" type="button">Simpan Pengaturan</button>
+      <button id="clear-key" type="button">Hapus Kunci</button>
+    </div>
+    <p id="settings-status" class="status" role="status"></p>
+  </section>
+
+  <section class="card" aria-label="Tentang">
+    <h2>Cara kerja &amp; kejujuran</h2>
+    <ol>
+      <li><strong>Analisis lokal:</strong> jenis pekerjaan, anggaran, dan tenggat dikenali dari kata kunci dan pola teks di perangkat Anda — bukan oleh model AI.</li>
+      <li><strong>Draf template:</strong> draf disusun dari template berdasarkan jenis pekerjaan, nada, dan detail yang Anda isi. Aplikasi tidak pernah mengarang pengalaman, portofolio, atau sertifikat.</li>
+      <li><strong>AI opsional:</strong> poles dengan AI hanya memperbaiki bahasa, memakai kunci Anda sendiri, dan hanya bila Anda menekannya.</li>
+    </ol>
+    <p class="muted small">Dibangun untuk SLAY HACKS 2026 oleh Erwin Saputra. Kode sumber: <a href="https://github.com/Erwinsp27/draftkerja">github.com/Erwinsp27/draftkerja</a>.</p>
+  </section>
+</main>
+
+<div id="caption-bar" hidden></div>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
